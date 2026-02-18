@@ -1,0 +1,29 @@
+<!-- templates/login.html -->
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <!-- identificador puede ser username o email -->
+  <form method="post" action="{{ url_for('auth.login') }}">
+    <label>Usuario o Email: <input name="identifier" required></label><br>
+    <label>Contraseña: <input name="password" type="password" required></label><br>
+    <button type="submit">Entrar</button>
+  </form>
+
+  <p>¿No tenés cuenta? <a href="{{ url_for('auth.register') }}">Registrate</a></p>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul>
+        {% for m in messages %}
+          <li>{{ m }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+</body>
+</html>

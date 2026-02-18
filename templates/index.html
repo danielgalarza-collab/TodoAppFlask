@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Tareas</title>
+</head>
+<body>
+    <h1>Lista de Tareas</h1>
+
+    <!-- Formulario para agregar una tarea -->
+    <form method="POST" action="{{ url_for('tasks.add') }}">
+        <input type="text" name="title" placeholder="Título" required>
+        <input type="text" name="description" placeholder="Descripción">
+
+        <select name="priority">
+            <option value="baja">Baja</option>
+            <option value="media">Media</option>
+            <option value="alta">Alta</option>
+        </select>
+
+        <button type="submit">Agregar</button>
+    </form>
+
+    <hr>
+
+    <!-- Lista de tareas -->
+    <ul>
+      {% for tarea in tareas %}
+        <li>
+          <strong>{{ tarea.title }}</strong> - {{ tarea.description }} ({{ tarea.created_at.strftime("%Y-%m-%d %H:%M:%S") }}) - {{ tarea.priority }}
+
+          {% if tarea.done %}
+            ✅ Hecha
+          {% else %}
+            ❌ Pendiente
+          {% endif %}
+
+          <!-- Botón para marcar como completada -->
+          <form action="{{ url_for('tasks.completar', id=tarea.id) }}" method="POST" style="display:inline;">
+            <button type="submit" style="background-color:lightgreen;">Marcar</button>
+          </form>
+
+          <!-- Formulario para editar -->
+          <form action="{{ url_for('tasks.editar', id=tarea.id) }}" method="POST" style="display:inline;">
+            <input type="text" name="nuevo_titulo" placeholder="Nuevo título" required>
+            <input type="text" name="nueva_descripcion" placeholder="Nueva descripción">
+            <button type="submit" style="background-color:orange;">Editar</button>
+          </form>
+
+          <!-- Botón para eliminar -->
+          <form action="{{ url_for('tasks.eliminar', id=tarea.id) }}" method="POST" style="display:inline;">
+            <button type="submit" style="background-color:red;">Eliminar</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <hr>
+    <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+</body>
+</html>
+
+
+
