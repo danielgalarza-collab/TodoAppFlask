@@ -4,12 +4,16 @@ from .extensions import db
 from app.extensions import db
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
+    __tablename__ = "users"
 
-    tasks = db.relationship("Task", backref="user", lazy=True)
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.Text)
+    last_name = db.Column(db.Text)
+    username = db.Column(db.Text, nullable=False, unique=True)
+    email = db.Column(db.Text, unique=True)
+    password_hash = db.Column(db.Text, nullable=False)
+
+    tasks = db.relationship("Task", back_populates="user")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -22,21 +26,43 @@ class User(db.Model):
 
 
 class Task(db.Model):
+    __tablename__ = "tasks"
+
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
-    priority = db.Column(db.String(20), default="media")
-    done = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    parent_task_id = db.Column(
+        db.Integer,
+        db.ForeignKey("tasks.id", ondelete="CASCADE")
+    )
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey("user.id"),
+        db.ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
 
-    def __repr__(self):
-        return f"<Task {self.title}>"
+    list_id = db.Column(
+        db.Integer,
+        db.ForeignKey("lists.id", ondelete="SET NULL")
+    )
+
+    priority_id = db.Column(
+        db.Integer,
+        db.ForeignKey("priorities.id")
+    )
+
+    status_id = db.Column(
+        db.Integer,
+        db.ForeignKey("statuses.id")
+    )
+
+    #Relaciones ORM
+    user = db.relationship("User", back_populates="tasks")
+    status = db.relationship("Status")
+    priority = db.relationship("Priority")
+    parent_task = db.relationship("Task", remote_side=[id])
 
 
 

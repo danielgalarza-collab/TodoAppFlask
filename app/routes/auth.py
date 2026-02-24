@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.extensions import db
-from app.models import User, Status, Priority
+from app.models import User, Status, Priority, Task
 from sqlalchemy import text
 auth_bp = Blueprint("auth", __name__)
 
@@ -79,3 +79,9 @@ def test_status():
 def test_priorities():
     priorities = Priority.query.all()
     return ", ".join([p.name for p in priorities])
+
+
+@auth_bp.route("/test_tasks")
+def test_tasks():
+    tasks = Task.query.all()
+    return str(tasks)
