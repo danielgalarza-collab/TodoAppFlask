@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.extensions import db
-from app.models import User
-
+from app.models import User, Status, Priority
+from sqlalchemy import text
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -59,3 +59,23 @@ def login():
 def logout():
     session.pop("user_id", None)
     return redirect(url_for("auth.login"))
+
+
+
+@auth_bp.route("/test_db")
+def test_db():
+    try:
+        db.session.execute(text("SELECT 1"))
+        return "Conexión a PostgreSQL OK"
+    except Exception as e:
+        return f"error: {e}"
+
+@auth_bp.route("/test_status")
+def test_status():
+    statuses = Status.query.all()
+    return ", ".join([s.name for s in statuses])
+
+@auth_bp.route("/test_priorities")
+def test_priorities():
+    priorities = Priority.query.all()
+    return ", ".join([p.name for p in priorities])

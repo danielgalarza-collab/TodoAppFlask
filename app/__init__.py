@@ -6,13 +6,15 @@ from .extensions import db
 def create_app(template_folder=None):
     app = Flask(__name__, template_folder="../templates")
     app.config['SECRET_KEY'] = 'tu_clave_secreta'
-   # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://usuario:password@localhost/todo_app"
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+    app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://daniel:daniel@localhost/todo_app"
+   # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
     db.init_app(app)
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(tasks_bp)
-
+    @app.route("/")
+    def home():
+        return "Servidor funcionando"
     return app
 
