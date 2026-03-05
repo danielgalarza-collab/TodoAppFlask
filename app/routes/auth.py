@@ -2,6 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from app.extensions import db
 from app.models import User, Status, Priority, Task
 from sqlalchemy import text
+from flask_login import login_user, logout_user, login_required, current_user
+
+
 auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -31,7 +34,6 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    session["user_id"] = user.id
     return redirect(url_for("tasks.index"))
 
 
@@ -51,14 +53,15 @@ def login():
         flash("Usuario o contraseña incorrectos")
         return redirect(url_for("auth.login"))
 
-    session["user_id"] = user.id
+    login_user(user) 
+
     return redirect(url_for("tasks.index"))
 
 
-@auth_bp.route("/logout")
-def logout():
-    session.pop("user_id", None)
-    return redirect(url_for("auth.login"))
+#@auth_bp.route("/logout")
+#def logout():
+   # session.pop("user_id", None)
+   # return redirect(url_for("auth.login"))
 
 
 
@@ -82,6 +85,35 @@ def test_priorities():
 
 
 @auth_bp.route("/test_tasks")
+@login_required
 def test_tasks():
-    tasks = Task.query.all()
+    tasks = Task.query.filter_by(user_id=current_user.id).all()
     return str(tasks)
+
+@auth_bp.route("/create_test_task")
+def create_test_task():
+    user = User.query.first()
+    status = Status.query.first()
+    priority = Priority.query.first()
+
+    if not user or not status or not priority:
+        return "Faltan datos en la base (user/status/priority)"
+
+    task = Task(
+        title="Primera tarea real",
+        description="Probando relaciones ORM",
+        user_id=user.id,
+        status_id=status.id,
+        priority_id=priority.id
+    )
+
+    db.session.add(task)
+    db.session.commit()
+
+    return "Tarea creada correctamentee"
+
+@auth_bp.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return "Logout exitoso"

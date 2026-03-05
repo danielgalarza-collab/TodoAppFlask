@@ -2,8 +2,9 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from .extensions import db
 from app.extensions import db
+from flask_login import UserMixin
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +48,7 @@ class Task(db.Model):
         db.Integer,
         db.ForeignKey("lists.id", ondelete="SET NULL")
     )
+    list = db.relationship("List", back_populates="tasks")
 
     priority_id = db.Column(
         db.Integer,
@@ -80,3 +82,11 @@ class Priority(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
+
+class List(db.Model):
+    __tablename__ = "lists"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Text, nullable=False)
+
+    tasks = db.relationship("Task", back_populates="list")
