@@ -27,7 +27,7 @@
     <ul>
       {% for tarea in tareas %}
         <li>
-          <strong>{{ tarea.title }}</strong> - {{ tarea.description }} ({{ tarea.created_at.strftime("%Y-%m-%d %H:%M:%S") }}) - {{ tarea.priority }}
+          <strong>{{ tarea.title }}</strong> - {{ tarea.description }} - {{ tarea.priority.name}}
 
           {% if tarea.done %}
             ✅ Hecha
