@@ -4,6 +4,7 @@ from .routes.tasks import tasks_bp
 from .extensions import db
 from app.models import User
 from flask_login import LoginManager
+from .routes.api_tasks import api_tasks_bp
 
 login_manager = LoginManager()
 
@@ -20,6 +21,7 @@ def create_app(template_folder=None):
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(tasks_bp)
+    app.register_blueprint(api_tasks_bp)
     @app.route("/")
     def home():
         return "Servidor funcionando"
