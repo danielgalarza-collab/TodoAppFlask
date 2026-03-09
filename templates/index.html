@@ -1,64 +1,162 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Lista de Tareas</title>
+<meta charset="UTF-8">
+<title>Lista de Tareas</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+background:#f4f6f9;
+}
+
+.container{
+margin-top:40px;
+}
+
+.task-card{
+margin-bottom:15px;
+}
+
+</style>
+
 </head>
 <body>
-    <h1>Lista de Tareas</h1>
 
-    <!-- Formulario para agregar una tarea -->
-    <form method="POST" action="{{ url_for('tasks.add') }}">
-        <input type="text" name="title" placeholder="Título" required>
-        <input type="text" name="description" placeholder="Descripción">
+<div class="container">
 
-        <select name="priority">
-            <option value="baja">Baja</option>
-            <option value="media">Media</option>
-            <option value="alta">Alta</option>
-        </select>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <button type="submit">Agregar</button>
-    </form>
+<h1>Lista de Tareas</h1>
 
-    <hr>
+<a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+Cerrar sesión
+</a>
 
-    <!-- Lista de tareas -->
-    <ul>
-      {% for tarea in tareas %}
-        <li>
-          <strong>{{ tarea.title }}</strong> - {{ tarea.description }} - {{ tarea.priority.name}}
+</div>
 
-          {% if tarea.done %}
-            ✅ Hecha
-          {% else %}
-            ❌ Pendiente
-          {% endif %}
+<div class="card mb-4 shadow">
+<div class="card-body">
 
-          <!-- Botón para marcar como completada -->
-          <form action="{{ url_for('tasks.completar', id=tarea.id) }}" method="POST" style="display:inline;">
-            <button type="submit" style="background-color:lightgreen;">Marcar</button>
-          </form>
+<h4>Agregar tarea</h4>
 
-          <!-- Formulario para editar -->
-          <form action="{{ url_for('tasks.editar', id=tarea.id) }}" method="POST" style="display:inline;">
-            <input type="text" name="nuevo_titulo" placeholder="Nuevo título" required>
-            <input type="text" name="nueva_descripcion" placeholder="Nueva descripción">
-            <button type="submit" style="background-color:orange;">Editar</button>
-          </form>
+<form method="POST" action="{{ url_for('tasks.add') }}">
 
-          <!-- Botón para eliminar -->
-          <form action="{{ url_for('tasks.eliminar', id=tarea.id) }}" method="POST" style="display:inline;">
-            <button type="submit" style="background-color:red;">Eliminar</button>
-          </form>
-        </li>
-      {% endfor %}
-    </ul>
+<div class="row">
 
-    <hr>
-    <a href="{{ url_for('auth.logout') }}">Cerrar sesión</a>
+<div class="col-md-3">
+<input type="text" name="title" class="form-control" placeholder="Título" required>
+</div>
+
+<div class="col-md-4">
+<input type="text" name="description" class="form-control" placeholder="Descripción">
+</div>
+
+<div class="col-md-2">
+<select name="priority" class="form-select">
+<option value="baja">Baja</option>
+<option value="media">Media</option>
+<option value="alta">Alta</option>
+</select>
+</div>
+
+<div class="col-md-2">
+<button type="submit" class="btn btn-primary w-100">Agregar</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+</div>
+
+
+{% for tarea in tareas %}
+
+<div class="card task-card shadow-sm">
+
+<div class="card-body">
+
+<div class="row align-items-center">
+
+<div class="col-md-3">
+<strong>{{ tarea.title }}</strong>
+</div>
+
+<div class="col-md-3">
+{{ tarea.description }}
+</div>
+
+<div class="col-md-2">
+
+{% if tarea.priority.name == "alta" %}
+<span class="badge bg-danger">Alta</span>
+
+{% elif tarea.priority.name == "media" %}
+<span class="badge bg-warning">Media</span>
+
+{% else %}
+<span class="badge bg-secondary">Baja</span>
+{% endif %}
+
+</div>
+
+<div class="col-md-1">
+
+{% if tarea.done %}
+<span class="text-success">✔</span>
+{% else %}
+<span class="text-danger">✘</span>
+{% endif %}
+
+</div>
+
+<div class="col-md-3">
+
+<form action="{{ url_for('tasks.completar', id=tarea.id) }}" method="POST" style="display:inline;">
+<button class="btn btn-success btn-sm">✓</button>
+</form>
+
+<form action="{{ url_for('tasks.eliminar', id=tarea.id) }}" method="POST" style="display:inline;">
+<button class="btn btn-danger btn-sm">Eliminar</button>
+</form>
+
+</div>
+
+</div>
+
+<hr>
+
+<form action="{{ url_for('tasks.editar', id=tarea.id) }}" method="POST">
+
+<div class="row">
+
+<div class="col-md-4">
+<input type="text" name="nuevo_titulo" class="form-control form-control-sm" placeholder="Nuevo título">
+</div>
+
+<div class="col-md-4">
+<input type="text" name="nueva_descripcion" class="form-control form-control-sm" placeholder="Nueva descripción">
+</div>
+
+<div class="col-md-2">
+<button class="btn btn-warning btn-sm">Editar</button>
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
 </body>
 </html>
-
-
-
