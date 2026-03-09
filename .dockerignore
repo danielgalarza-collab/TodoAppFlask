@@ -1,0 +1,27 @@
+# Entorno virtual
+venv/
+
+# Cachés de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de logs
+*.log
+
+# Git
+.git/
+.gitignore
+
+# Configuración local
+instance/
+
+# Archivos temporales
+*.swp
+*.tmp
+*.DS_Store
+
+# Archivos de base de datos locales
+*.db
+*.sqlite3
