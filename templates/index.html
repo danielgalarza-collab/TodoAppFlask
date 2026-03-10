@@ -5,21 +5,22 @@
 <title>Lista de Tareas</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-
 body{
-background:#f4f6f9;
+    background:#f4f6f9;
 }
-
 .container{
-margin-top:40px;
+    margin-top:40px;
 }
-
 .task-card{
-margin-bottom:15px;
+    margin-bottom:15px;
 }
-
+.tarea-completada {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
 </style>
 
 </head>
@@ -27,134 +28,175 @@ margin-bottom:15px;
 
 <div class="container">
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Lista de Tareas</h1>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Cerrar sesión</a>
+    </div>
 
-<h1>Lista de Tareas</h1>
+    <!-- FORMULARIO PARA CREAR LISTAS -->
+    <div class="card mb-4 shadow">
+        <div class="card-body">
 
-<a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
-Cerrar sesión
-</a>
+            <h4 class="mb-3">Listas</h4>
 
-</div>
+            <form method="POST" action="{{ url_for('tasks.add_list') }}" class="mb-3">
+                <div class="input-group">
+                    <input type="text" name="name" class="form-control form-control-lg" placeholder="Nueva lista" required>
+                    <button class="btn btn-secondary btn-lg">Crear lista</button>
+                </div>
+            </form>
 
-<div class="card mb-4 shadow">
-<div class="card-body">
+            <hr>
 
-<h4>Agregar tarea</h4>
+            <!-- FORMULARIO PARA AGREGAR TAREAS -->
+            <h4 class="mb-3">Agregar tarea</h4>
 
-<form method="POST" action="{{ url_for('tasks.add') }}">
+            <form method="POST" action="{{ url_for('tasks.add') }}">
+                <div class="row g-3">
 
-<div class="row">
+                    <!-- Título -->
+                    <div class="col-md-3">
+                        <input type="text" name="title" class="form-control form-control-lg" placeholder="Título" required>
+                    </div>
 
-<div class="col-md-3">
-<input type="text" name="title" class="form-control" placeholder="Título" required>
-</div>
+                    <!-- Descripción -->
+                    <div class="col-md-4">
+                        <input type="text" name="description" class="form-control form-control-lg" placeholder="Descripción">
+                    </div>
 
-<div class="col-md-4">
-<input type="text" name="description" class="form-control" placeholder="Descripción">
-</div>
+                    <!-- Prioridad -->
+                    <div class="col-md-2">
+                        <select name="priority" class="form-select form-select-lg">
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
 
-<div class="col-md-2">
-<select name="priority" class="form-select">
-<option value="baja">Baja</option>
-<option value="media">Media</option>
-<option value="alta">Alta</option>
-</select>
-</div>
+                    <!-- Lista -->
+                    <div class="col-md-2">
+                        <select name="list_id" class="form-select form-select-lg">
+                            {% for lista in listas %}
+                                <option value="{{ lista.id }}">{{ lista.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-<div class="col-md-2">
-<button type="submit" class="btn btn-primary w-100">Agregar</button>
-</div>
+                    <!-- BOTÓN CENTRADO Y ESTRECHO -->
+                    <div class="col-md-12 mt-2 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-plus-circle"></i> Agregar tarea
+                        </button>
+                    </div>
 
-</div>
+                </div>
+            </form>
 
-</form>
+        </div>
+    </div>
 
-</div>
-</div>
+    <!-- LISTADO DE TAREAS -->
+    {% for tarea in tareas %}
 
+    <div class="card task-card shadow-sm">
+        <div class="card-body">
 
-{% for tarea in tareas %}
+            <div class="row align-items-center">
 
-<div class="card task-card shadow-sm">
+                <!-- TÍTULO -->
+                <div class="col-md-3">
+                    {% if tarea.done %}
+                        <strong class="tarea-completada text-success">{{ tarea.title }}</strong>
+                    {% else %}
+                        <strong>{{ tarea.title }}</strong>
+                    {% endif %}
+                </div>
 
-<div class="card-body">
+                <!-- DESCRIPCIÓN -->
+                <div class="col-md-3">
+                    {% if tarea.done %}
+                        <span class="tarea-completada">{{ tarea.description }}</span>
+                    {% else %}
+                        {{ tarea.description }}
+                    {% endif %}
+                </div>
 
-<div class="row align-items-center">
+                <!-- PRIORIDAD -->
+                <div class="col-md-2">
+                    {% if tarea.priority.name == "alta" %}
+                        <span class="badge bg-danger">Alta</span>
+                    {% elif tarea.priority.name == "media" %}
+                        <span class="badge bg-warning">Media</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Baja</span>
+                    {% endif %}
+                </div>
 
-<div class="col-md-3">
-<strong>{{ tarea.title }}</strong>
-</div>
+                <!-- LISTA -->
+                <div class="col-md-2">
+                    {% if tarea.list %}
+                        <span class="badge bg-info">{{ tarea.list.name }}</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Sin lista</span>
+                    {% endif %}
+                </div>
 
-<div class="col-md-3">
-{{ tarea.description }}
-</div>
+                <!-- BOTONES -->
+                <div class="col-md-2 d-flex gap-2 align-items-center justify-content-end">
 
-<div class="col-md-2">
+                    <!-- Completar -->
+                    <form action="{{ url_for('tasks.completar', id=tarea.id) }}" 
+                          method="POST" 
+                          class="m-0 p-0 d-inline-block">
+                        <button type="submit" 
+                                class="btn btn-outline-success btn-sm rounded-circle" 
+                                title="Marcar como completada">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </form>
 
-{% if tarea.priority.name == "alta" %}
-<span class="badge bg-danger">Alta</span>
+                    <!-- Eliminar -->
+                    <form action="{{ url_for('tasks.eliminar', id=tarea.id) }}" 
+                          method="POST" 
+                          class="m-0 p-0 d-inline-block">
+                        <button type="submit" 
+                                class="btn btn-outline-danger btn-sm rounded-circle" 
+                                title="Eliminar tarea">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
 
-{% elif tarea.priority.name == "media" %}
-<span class="badge bg-warning">Media</span>
+                </div>
 
-{% else %}
-<span class="badge bg-secondary">Baja</span>
-{% endif %}
+            </div>
 
-</div>
+            <hr>
 
-<div class="col-md-1">
+            <!-- FORMULARIO PARA EDITAR -->
+            <form action="{{ url_for('tasks.editar', id=tarea.id) }}" method="POST">
 
-{% if tarea.done %}
-<span class="text-success">✔</span>
-{% else %}
-<span class="text-danger">✘</span>
-{% endif %}
+                <div class="row">
 
-</div>
+                    <div class="col-md-4">
+                        <input type="text" name="nuevo_titulo" class="form-control form-control-sm" placeholder="Nuevo título">
+                    </div>
 
-<div class="col-md-3">
+                    <div class="col-md-4">
+                        <input type="text" name="nueva_descripcion" class="form-control form-control-sm" placeholder="Nueva descripción">
+                    </div>
 
-<form action="{{ url_for('tasks.completar', id=tarea.id) }}" method="POST" style="display:inline;">
-<button class="btn btn-success btn-sm">✓</button>
-</form>
+                    <div class="col-md-2">
+                        <button class="btn btn-warning btn-sm">Editar</button>
+                    </div>
 
-<form action="{{ url_for('tasks.eliminar', id=tarea.id) }}" method="POST" style="display:inline;">
-<button class="btn btn-danger btn-sm">Eliminar</button>
-</form>
+                </div>
 
-</div>
+            </form>
 
-</div>
+        </div>
+    </div>
 
-<hr>
-
-<form action="{{ url_for('tasks.editar', id=tarea.id) }}" method="POST">
-
-<div class="row">
-
-<div class="col-md-4">
-<input type="text" name="nuevo_titulo" class="form-control form-control-sm" placeholder="Nuevo título">
-</div>
-
-<div class="col-md-4">
-<input type="text" name="nueva_descripcion" class="form-control form-control-sm" placeholder="Nueva descripción">
-</div>
-
-<div class="col-md-2">
-<button class="btn btn-warning btn-sm">Editar</button>
-</div>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
-{% endfor %}
+    {% endfor %}
 
 </div>
 

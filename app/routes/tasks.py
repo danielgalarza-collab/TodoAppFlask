@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from app.extensions import db
-from app.models import Task, Priority
+from app.models import Task, Priority, List
 from flask_login import login_required, current_user
 
 tasks_bp = Blueprint("tasks", __name__)
@@ -9,7 +9,8 @@ tasks_bp = Blueprint("tasks", __name__)
 @login_required
 def index():
     tareas = Task.query.filter_by(user_id=current_user.id).all()
-    return render_template("index.html", tareas=tareas)
+    listas = List.query.all()
+    return render_template("index.html", tareas=tareas, listas=listas)
 
 @tasks_bp.route("/add", methods=["POST"])
 @login_required
@@ -19,11 +20,14 @@ def add():
 
     prioridad = Priority.query.filter_by(name=prioridad_nombre).first()
 
+    lista_id = request.form.get("list_id")
+
     nueva_tarea = Task(
         title=request.form["title"],
         description=request.form["description"],
         priority=prioridad,
-        user_id=current_user.id
+        user_id=current_user.id,
+	list_id=lista_id
     )
 
     db.session.add(nueva_tarea)
@@ -73,4 +77,13 @@ def eliminar(id):
     db.session.delete(tarea)
     db.session.commit()
 
+    return redirect(url_for("tasks.index"))
+
+@tasks_bp.route("/add_list", methods=["POST"])
+@login_required
+def add_list():
+    nombre = request.form["name"]
+    nueva_lista = List(name=nombre)
+    db.session.add(nueva_lista)
+    db.session.commit()
     return redirect(url_for("tasks.index"))
